@@ -29,10 +29,17 @@
 
 import pygtk
 pygtk.require('2.0')
-import gtk, setproctitle, sys, argparse, subprocess
+
+import gtk
+import setproctitle
+import sys
+import argparse
+import subprocess
+import logging
 
 class Patron:
    def run_command(self, widget, data=None):
+      logging.debug("Running " + str(self.cmdarray[self.curcmd]))
       subprocess.call(self.cmdarray[self.curcmd])
       self.curcmd = (self.curcmd + 1) % self.cmdcount
       self.curlbl = (self.curlbl + 1) % self.lblcount
@@ -109,7 +116,8 @@ def parse_args():
          nargs='+')
    parser.add_argument('-w', type=int, dest='width', help='border width of the window')
    parser.add_argument('commands', metavar='commands', type=str, help='commands to run',
-         nargs='+') # nargs='+', so we can take multiple commands!
+         nargs='+')
+   parser.add_argument('-g', action='store_true', dest='debug', help='debug mode')
    parser.set_defaults(labels=['Boss!'], width=1)
    args = parser.parse_args()
    return args
@@ -119,6 +127,9 @@ if __name__ == '__main__':
    setproctitle.setproctitle('patron')
 
    args = parse_args()
+
+   if args.debug:
+      logging.basicConfig(level=logging.DEBUG)
 
    patron = Patron(args.commands, args.labels, args.width)
    patron.main()

@@ -1,0 +1,121 @@
+#!/usr/local/bin/python
+# -*- coding: utf-8 -*-
+#
+# patron: small gtk button that executes a command when pressed
+#
+# Copyright (c) 2014, Berk Özbalcı
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without modification,
+# are permitted provided that the following conditions are met:
+# 
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+# 
+# * Redistributions in binary form must reproduce the above copyright notice, this
+#   list of conditions and the following disclaimer in the documentation and/or
+#   other materials provided with the distribution.
+# 
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+# ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+import pygtk
+pygtk.require('2.0')
+import gtk, sys, argparse, subprocess
+
+class Patron:
+   def run_command(self, widget, data=None):
+      subprocess.call(self.cmdarray[self.curcmd])
+      self.curcmd = (self.curcmd + 1) % self.cmdcount
+      self.curlbl = (self.curlbl + 1) % self.lblcount
+      self.set_label(self.lblarray[self.curlbl], self.button)
+
+   def set_label(self, label, button):
+      button.set_label(label)
+
+   def delete_event(self, widget, data=None):
+      return False
+
+   def destroy(self, widget, data=None):
+      gtk.main_quit()
+
+   def __init__(self, cmdarray, lblarray=['Boss!'], width=1):
+      # We'll copy the list here
+      self.cmdarray = []
+
+      self.lblarray = lblarray
+
+      # cmdarray: the sequence of commands that we accept.
+      for C in cmdarray:
+         split = C.split()
+         cmd = split[0]
+         args = split[1:]
+         self.cmdarray.append([cmd] + args)
+
+      # amount of commands, labels that we alternate between
+      self.cmdcount = len(cmdarray)
+      self.lblcount = len(lblarray)
+
+      # the current command we are asked to run
+      self.curcmd = 0
+
+      # the current label that we are going to print
+      self.curlbl = 0
+
+      # create a new window
+      self.window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+
+      # escape plan
+      self.window.connect('delete_event', self.delete_event)
+      self.window.connect('destroy', self.destroy)
+
+      # border width of the window
+      self.window.set_border_width(width)
+
+      # the "boss" button, can customize the label!
+      self.button = gtk.Button(lblarray[0])
+
+      # connect the button to the function
+      self.button.connect('clicked', self.run_command, None)
+
+      # add the button into the window
+      self.window.add(self.button)
+
+      # et voila!
+      self.button.show()
+      self.window.show()
+
+   def main(self):
+      gtk.main()
+
+
+def parse_args():
+   parser = argparse.ArgumentParser(
+      prog='patron',
+      description='Small GTK button that runs a command when pressed.',
+      epilog='For alternating commands/labels on each press, provide multiple '
+      'commands/labels. Happy slacking!'
+   )
+
+   parser.add_argument('-l', type=str, dest='labels', help='the labels of the button',
+         nargs='+')
+   parser.add_argument('-w', type=int, dest='width', help='border width of the window')
+   parser.add_argument('commands', metavar='commands', type=str, help='commands to run',
+         nargs='+') # nargs='+', so we can take multiple commands!
+   parser.set_defaults(labels=['Boss!'], width=1)
+   args = parser.parse_args()
+   return args
+
+if __name__ == '__main__':
+   args = parse_args()
+
+   patron = Patron(args.commands, args.labels, args.width)
+   patron.main()

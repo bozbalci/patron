@@ -29,7 +29,7 @@
 
 import pygtk
 pygtk.require('2.0')
-import gtk, sys, argparse, subprocess
+import gtk, setproctitle, sys, argparse, subprocess
 
 class Patron:
    def run_command(self, widget, data=None):
@@ -115,6 +115,9 @@ def parse_args():
    return args
 
 if __name__ == '__main__':
+   # Just so window managers can find this and set attritubes
+   setproctitle.setproctitle('patron')
+
    args = parse_args()
 
    patron = Patron(args.commands, args.labels, args.width)

@@ -46,6 +46,7 @@ Requirements
 ------------
 * Tested on Python 2.7.6
 * pygtk
+* setproctitle
 
 License
 -------

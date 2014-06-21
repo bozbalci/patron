@@ -6,7 +6,8 @@ A small Python script that creates a small GTK window containing a button with a
 Usage
 -----
 
-    usage: patron [-h] [-l LABELS [LABELS ...]] [-w WIDTH] commands [commands ...]
+    usage: patron [-h] [-l LABELS [LABELS ...]] [-w WIDTH] [-g]
+                  commands [commands ...]
     
     Small GTK button that runs a command when pressed.
     
@@ -18,6 +19,7 @@ Usage
       -l LABELS [LABELS ...]
                             the labels of the button
       -w WIDTH              border width of the window
+      -g                    debug mode
     
     For alternating commands/labels on each press, provide multiple
     commands/labels. Happy slacking!
@@ -27,7 +29,7 @@ Examples
 
     # Return to the first workspace when the button is clicked, and to the
     # second one when clicked again
-    patron 'bspc desktop -f "^1"' 'bspc desktop -f "^2"' -l 'Work!' 'Slack!'
+    patron 'bspc desktop -f ^1' 'bspc desktop -f ^2' -l 'Work!' 'Slack!'
     
     # Mute all sounds when the boss is near, and blast it off when he's away (FreeBSD)
     patron 'mixer -s vol 0' 'mixer -s vol 100' -l 'mute!' 'PARTY TIME!!' -w 10 

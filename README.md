@@ -27,10 +27,10 @@ Examples
 
     # Return to the first workspace when the button is clicked, and to the
     # second one when clicked again
-    patron -l 'Work!' 'Slack!' 'bspc desktop -f "^1"' 'bspc desktop -f "^2"'
+    patron 'bspc desktop -f "^1"' 'bspc desktop -f "^2"' -l 'Work!' 'Slack!'
     
     # Mute all sounds when the boss is near, and blast it off when he's away (FreeBSD)
-    patron -l 'mute!' 'PARTY TIME!!' -w 10 'mixer -s vol 0' 'mixer -s vol 100'
+    patron 'mixer -s vol 0' 'mixer -s vol 100' -l 'mute!' 'PARTY TIME!!' -w 10 
    
     # Take a screenshot of the screen
     patron -l 'Scrot' 'scrot unix.png'
